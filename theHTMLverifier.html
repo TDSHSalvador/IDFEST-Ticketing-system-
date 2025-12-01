@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+  </head>
+<body style="font-family: Arial; padding: 20px;">
+
+  <h2>Ticket Check-In</h2>
+
+  <label>Enter Ticket ID:</label><br>
+  <input id="ticketID" type="text" style="padding:5px; width:200px">
+  <button onclick="searchTicket()" style="padding:5px 10px;">Search</button>
+
+  <div id="result" style="margin-top:20px;"></div>
+
+  <script>
+    function searchTicket() {
+      const id = document.getElementById("ticketID").value;
+
+      google.script.run
+        .withSuccessHandler(showResult)
+        .checkTicket(id);
+    }
+
+    function showResult(data) {
+      const div = document.getElementById("result");
+
+      if (!data.found) {
+        div.innerHTML = `<span style="color:red;">❌ Ticket not found.</span>`;
+        return;
+      }
+
+      div.innerHTML = `
+        <h3>Ticket Details</h3>
+        <b>Name:</b> ${data.Name}<br>
+        <b>Ticket ID:</b> ${data.TicketID}<br>
+        <b>Pax:</b> ${data.Pax}<br>
+        <b>Seat:</b> ${data.Seat}<br>
+        <b>Status:</b> ${data.Status}<br><br>
+
+        <button onclick="checkIn(${data.row})"
+          style="padding:8px 12px; background:green; color:white; border:none;">
+          Mark as Checked In
+        </button>
+      `;
+    }
+
+    function checkIn(row) {
+      google.script.run
+        .withSuccessHandler(() => {
+          document.getElementById("result").innerHTML += 
+            "<br><br><span style='color:green;'>✔ Status updated to Checked in.</span>";
+        })
+        .markCheckedIn(row);
+    }
+  </script>
+
+</body>
+</html>
