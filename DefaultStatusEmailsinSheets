@@ -1,0 +1,29 @@
+function onFormSubmit(e) {
+  // Get the active sheet from the form submission event
+  const sheet = e.source.getActiveSheet();
+  if (!sheet) {
+    Logger.log('Sheet not found!');
+    return;
+  }
+
+  // Find the row where data was added
+  const row = e.range ? e.range.getRow() : sheet.getLastRow();
+
+  // Get header values
+  const header = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+
+  // Find column indexes safely
+  const verificationStatusColumn = header.findIndex(h => h.toLowerCase().trim() === 'status') + 1;
+  const emailSentStatusColumn = header.findIndex(h => h.toLowerCase().trim() === 'email status') + 1;
+
+  if (verificationStatusColumn === 0 || emailSentStatusColumn === 0) {
+    Logger.log('Error: Columns not found.');
+    return;
+  }
+
+  // Set default values for the new response
+  sheet.getRange(row, verificationStatusColumn).setValue('Not Verified');
+  sheet.getRange(row, emailSentStatusColumn).setValue('Unsent');
+
+  Logger.log(`Default statuses set for row ${row}`);
+}
